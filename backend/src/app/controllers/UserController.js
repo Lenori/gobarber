@@ -36,13 +36,17 @@ class UserController {
                 .json({error: msg.user.create.error.err_email_already_used});
         }
 
-        const {id, name, email, provider} = await User.create(req.body);
+        const user = await User.create(req.body);
 
-        return res.json({
-            id,
-            email,
-            name,
-            provider
+        return res
+            .json({
+                success: msg.user.create.success,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    provider: user.provider
+            }
         });
     }
 
@@ -50,6 +54,7 @@ class UserController {
         const schema = Yup.object().shape({
             name: Yup.string(),
             email: Yup.string().email(),
+            avatar_id: Yup.number(),
             oldPassword: Yup.string().min(authConfig.minPasswordLength),
             password: Yup.string().min(authConfig.minPasswordLength)
                 .when('oldPassword', (oldPassword, field) => 

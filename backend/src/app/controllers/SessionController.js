@@ -47,6 +47,7 @@ class SessionController {
 
         return res
             .json({
+                success: msg.session.create.success,
                 user: {
                     id,
                     name,
