@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import {startOfHour, parseISO, isBefore, format} from 'date-fns';
+import {startOfHour, parseISO, isBefore, format, subHours} from 'date-fns';
 import pt from 'date-fns/locale/pt';
 
 import msg from '../../config/msgs';
@@ -9,6 +9,7 @@ import Appointment from '../models/Appointment';
 import File from '../models/File';
 
 import Notification from '../schemas/Notification';
+import Mail from '../../lib/Mail';
 
 class AppointmentController {
     async index(req, res) {
@@ -59,6 +60,12 @@ class AppointmentController {
         }
 
         const {provider_id, date} = req.body;
+
+        if (provider_id == req.userId) {
+            return res
+                .status(400)
+                .json({error: msg.appointment.create.error.err_user_same_as_provider});
+        }
 
         const userExists = await User.findOne({
             where: {
@@ -135,7 +142,49 @@ class AppointmentController {
     }
     
     async delete(req, res) {
-        return res.json();
+        const {id} = req.params;
+
+        const appointment = await Appointment.findByPk(id,
+            {include: [{
+                model: User,
+                as: 'provider',
+                attributes: ['name', 'email']
+            }]}
+        );
+
+        if (!appointment) {
+            return res
+                .status(400)
+                .json({error: msg.appointment.delete.error.err_appointment_not_found});
+        }
+
+        
+
+        if (appointment.user_id !== req.userId) {
+            return res
+                .status(401)
+                .json({error: msg.appointment.delete.error.err_user_not_owner});
+        }
+
+        const dateLimit = subHours(appointment.date, 2);
+        
+        if (isBefore(dateLimit, new Date())) {
+            return res
+                .status(401)
+                .json({error: msg.appointment.delete.error.err_appointment_too_soon});
+        }
+
+        await appointment.update({canceled_at: new Date()});
+
+        await Mail.sendMail({
+            to: `${appointment.provider.name} <${appointment.provider.email}>`,
+            subject: 'Agendamento cancelado',
+            text: 'Você tem um novo cancelamento.'
+        })
+
+        return res
+            .status(200)
+            .json({success: msg.appointment.delete.success});
     }    
 }
 

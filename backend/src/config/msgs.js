@@ -44,10 +44,11 @@ export default {
         create: {
             error: {
                 err_request_format_invalid: 'Formato da requisição inválido.',
-                err_user_not_found: 'Usuário informado não encontrado.',
-                err_user_not_provider: 'Usuário informado não é um provedor de serviços.',
+                err_user_same_as_provider: 'Usuário e prestador não podem possuir a mesma ID.',
+                err_user_not_found: 'Prestador informado não encontrado.',
+                err_user_not_provider: 'Usuário informado não é um prestador de serviços.',
                 err_date_past: 'É necessário selecionar uma data futura.',
-                err_date_not_available: 'Dia e horário não disponíveis para este provedor.'
+                err_date_not_available: 'Dia e horário não disponíveis para este prestador.'
             },
             success: 'Agendamento criado com sucesso.'
         },
@@ -55,13 +56,35 @@ export default {
             error: {
                 err_request_format_invalid: 'Formato da requisição inválido.',
             }
+        },
+        delete: {
+            error: {
+                err_appointment_not_found: 'Agendamento não encontrado.',
+                err_user_not_owner: 'Usuário não autorizado a editar agendamento.',
+                err_appointment_too_soon: 'Agendamento muito próximo para ser cancelado.'
+            },
+            success: 'Agendamento cancelado com sucesso.'
         }
     },
     schedule: {
         index: {
             error: {
-                err_user_not_provider: 'Usuário não é um provedor de serviços.',
+                err_user_not_provider: 'Usuário não é um prestador de serviços.',
             }
+        }
+    },
+    notification: {
+        index: {
+            error: {
+                err_user_not_provider: 'Usuário não é um prestador de serviços.',
+            }
+        },
+        update: {
+            error: {
+                err_user_not_provider: 'Usuário não é um prestador de serviços.',
+                err_notification_not_found: 'Nofificação inexistente.'
+            },
+            success: 'Notificação lida com sucesso.'
         }
     }
             
