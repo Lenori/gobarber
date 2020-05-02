@@ -60,6 +60,7 @@ export default {
         delete: {
             error: {
                 err_appointment_not_found: 'Agendamento não encontrado.',
+                err_appintment_already_cancelled: 'Este agendamento já foi cancelado.',
                 err_user_not_owner: 'Usuário não autorizado a editar agendamento.',
                 err_appointment_too_soon: 'Agendamento muito próximo para ser cancelado.'
             },

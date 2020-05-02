@@ -9,7 +9,9 @@ import Appointment from '../models/Appointment';
 import File from '../models/File';
 
 import Notification from '../schemas/Notification';
-import Mail from '../../lib/Mail';
+
+import CancellationMail from '../jobs/CancellationMail';
+import Queue from '../../lib/Queue';
 
 class AppointmentController {
     async index(req, res) {
@@ -145,11 +147,18 @@ class AppointmentController {
         const {id} = req.params;
 
         const appointment = await Appointment.findByPk(id,
-            {include: [{
+            {include: [
+                {
                 model: User,
                 as: 'provider',
                 attributes: ['name', 'email']
-            }]}
+                },
+                {
+                model: User,
+                as: 'user',
+                attributes: ['name', 'email']
+                }
+            ]}
         );
 
         if (!appointment) {
@@ -158,7 +167,11 @@ class AppointmentController {
                 .json({error: msg.appointment.delete.error.err_appointment_not_found});
         }
 
-        
+        if (appointment.canceled_at !== null) {
+            return res
+                .status(400)
+                .json({error: msg.appointment.delete.error.err_appintment_already_cancelled});
+        }
 
         if (appointment.user_id !== req.userId) {
             return res
@@ -176,11 +189,7 @@ class AppointmentController {
 
         await appointment.update({canceled_at: new Date()});
 
-        await Mail.sendMail({
-            to: `${appointment.provider.name} <${appointment.provider.email}>`,
-            subject: 'Agendamento cancelado',
-            text: 'Você tem um novo cancelamento.'
-        })
+        await Queue.add(CancellationMail.key, {appointment});
 
         return res
             .status(200)
