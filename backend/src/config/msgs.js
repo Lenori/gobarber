@@ -1,4 +1,9 @@
 export default {
+    server: {
+        errors: {
+            err_internal_server_error: 'Erro interno de servidor.'
+        }
+    },
     session: {
         create: {
             error: {
@@ -86,6 +91,13 @@ export default {
                 err_notification_not_found: 'Nofificação inexistente.'
             },
             success: 'Notificação lida com sucesso.'
+        }
+    },
+    available: {
+        index: {
+            error: {
+                err_date_not_provided: 'É necessário escolher uma data.'
+            }
         }
     }
             

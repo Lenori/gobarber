@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import mongoose from 'mongoose';
+import 'dotenv/config';
 
 import User from '../app/models/User';
 import File from '../app/models/File';
@@ -25,7 +26,7 @@ class Database {
 
     mongo() {
         this.mongoConnection = mongoose.connect(
-            'mongodb://localhost:27017/gobarber',
+            process.env.MONGO_URL,
             {
                 useNewUrlParser: true,
                 useFindAndModify: true

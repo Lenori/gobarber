@@ -17,9 +17,9 @@ import multerConfig from './config/multer'
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.get('/', (request, response) => {
-    return response.json({message: 'Hello World!'});
-});
+routes.get('/debug', (req, res) => {
+    throw new Error('My first Sentry error!');
+  });
 
 routes.post('/users', UserController.store);
 routes.post('/sessions', SessionController.store);
