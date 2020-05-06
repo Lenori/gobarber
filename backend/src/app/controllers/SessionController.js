@@ -5,6 +5,7 @@ import authConfig from '../../config/auth';
 import msg from '../../config/msgs';
 
 import User from '../models/User';
+import File from '../models/File';
 
 class SessionController {
     async index(req, res) {
@@ -28,7 +29,14 @@ class SessionController {
         const user = await User.findOne({
             where: {
                 email: email
-            }
+            },
+            include: [
+                {
+                    model: File,
+                    as: 'avatar',
+                    attributes: ['id', 'path', 'url']
+                }
+            ]
         })
 
         if (!user) {
@@ -43,7 +51,7 @@ class SessionController {
                 .json({error: msg.session.create.error.err_password_invalid})
         }
 
-        const {id, name} = user;
+        const {id, name, avatar, provider} = user;
 
         return res
             .json({
@@ -51,7 +59,9 @@ class SessionController {
                 user: {
                     id,
                     name,
-                    email
+                    email,
+                    avatar,
+                    provider
                 },
                 token: JWT.sign({id}, authConfig.secret,{
                     expiresIn: authConfig.expiresIn
